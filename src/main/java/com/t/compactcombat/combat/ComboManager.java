@@ -1,5 +1,8 @@
 package com.t.compactcombat.combat;
 
+import com.t.compactcombat.combat.weapon.WeaponData;
+import com.t.compactcombat.combat.weapon.WeaponManager;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 
@@ -27,21 +30,25 @@ public class ComboManager {
         if (mc.player == null) return;
         if (!CombatState.isCombatMode()) return;
         if (attackCooldownTicks > 0) return;
-        if (StaminaManager.getStamina() < 15) return;
 
-        StaminaManager.useStamina(15);
+        WeaponData weapon = WeaponManager.getCurrentWeapon(mc.player);
+        int staminaCost = Math.round(15 * weapon.getStaminaCostMultiplier());
+        if (StaminaManager.getStamina() < staminaCost) return;
+
+        StaminaManager.useStamina(staminaCost);
 
         comboStep++;
-        if (comboStep > 3) {
+        if (comboStep > weapon.getMaxCombo()) {
             comboStep = 1;
         }
 
         comboResetTicks = 20;
-        attackCooldownTicks = 8;
+        attackCooldownTicks = weapon.getBaseCooldownTicks();
         CombatManager.performComboAttack(comboStep);
 
         mc.player.displayClientMessage(
-                Component.literal("Combo Attack " + comboStep + " | Stamina: " + StaminaManager.getStamina()),
+                Component.literal("Weapon: " + weapon.getType() + " | Combo " + comboStep + "/"
+                        + weapon.getMaxCombo()),
                 true
         );
     }
