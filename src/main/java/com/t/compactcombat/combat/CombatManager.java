@@ -3,10 +3,16 @@ package com.t.compactcombat.combat;
 import com.t.compactcombat.client.CombatEffects;
 import com.t.compactcombat.client.CombatFeedback;
 import com.t.compactcombat.client.DamageNumberRenderer;
+import com.t.compactcombat.boss.BossData;
+import com.t.compactcombat.boss.BossManager;
 import com.t.compactcombat.combat.weapon.WeaponData;
 import com.t.compactcombat.combat.weapon.WeaponManager;
 import com.t.compactcombat.entity.elite.EliteData;
 import com.t.compactcombat.entity.elite.EliteManager;
+import com.t.compactcombat.loot.AffixData;
+import com.t.compactcombat.loot.AffixType;
+import com.t.compactcombat.loot.LootData;
+import com.t.compactcombat.loot.LootGenerator;
 import com.t.compactcombat.skill.SkillBonuses;
 import com.t.compactcombat.skill.SkillData;
 import com.t.compactcombat.skill.SkillManager;
@@ -41,6 +47,7 @@ public class CombatManager {
                 DamageNumberRenderer.spawn(target.getX(), target.getY() + target.getBbHeight() + 0.3, target.getZ(),
                         damage);
                 showEliteHitText(target);
+                updateBossHealth(player, target);
                 awardCombatExperience(player);
             }
         }
@@ -126,5 +133,47 @@ public class CombatManager {
         EliteData eliteData = EliteManager.getEliteData(target);
         DamageNumberRenderer.spawnText(target.getX(), target.getY() + target.getBbHeight() + 0.65, target.getZ(),
                 "ELITE: " + eliteData.getModifier(), eliteData.getColor());
+    }
+
+    private static void updateBossHealth(Player player, LivingEntity target) {
+        if (!BossManager.isBoss(target.getUUID()))
+            return;
+
+        BossData bossData = BossManager.getBoss(target.getUUID());
+        bossData.setCurrentHealth(target.getHealth());
+        bossData.updatePhase();
+
+        if (!target.isAlive() || target.getHealth() <= 0.0F) {
+            dropBossLoot(player);
+            BossManager.removeBoss(target.getUUID());
+        }
+    }
+
+    private static void dropBossLoot(Player player) {
+        LootData loot = LootGenerator.generate(player.getRandom());
+        player.displayClientMessage(Component.literal("LOOT DROPPED: " + loot.getDisplayName()), false);
+
+        for (AffixData affix : loot.getAffixes()) {
+            player.displayClientMessage(Component.literal(formatAffix(affix)), false);
+        }
+    }
+
+    private static String formatAffix(AffixData affix) {
+        String value = affix.getType() == AffixType.REACH
+                ? "+" + affix.getValue() + " Reach"
+                : "+" + affix.getValue() + "% " + formatAffixName(affix.getType());
+        return value;
+    }
+
+    private static String formatAffixName(AffixType type) {
+        return switch (type) {
+            case ATTACK_DAMAGE -> "Attack Damage";
+            case CRIT_CHANCE -> "Crit Chance";
+            case ATTACK_SPEED -> "Attack Speed";
+            case REACH -> "Reach";
+            case STAMINA -> "Stamina";
+            case DEFENSE -> "Defense";
+            case AGILITY -> "Agility";
+        };
     }
 }

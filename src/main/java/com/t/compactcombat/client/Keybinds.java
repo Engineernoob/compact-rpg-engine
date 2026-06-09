@@ -22,4 +22,11 @@ public class Keybinds {
             InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_LEFT_ALT,
             CATEGORY);
+
+    public static final KeyMapping MAKE_TARGET_BOSS = new KeyMapping(
+            "key." + CompactCombat.MOD_ID + ".make_target_boss",
+            KeyConflictContext.IN_GAME,
+            InputConstants.Type.KEYSYM,
+            GLFW.GLFW_KEY_B,
+            CATEGORY);
 }

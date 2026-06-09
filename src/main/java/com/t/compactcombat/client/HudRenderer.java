@@ -1,6 +1,9 @@
 package com.t.compactcombat.client;
 
 import com.t.compactcombat.CompactCombat;
+import com.t.compactcombat.boss.BossHudData;
+import com.t.compactcombat.boss.BossManager;
+import com.t.compactcombat.boss.BossPhase;
 import com.t.compactcombat.combat.CombatState;
 import com.t.compactcombat.combat.ComboManager;
 import com.t.compactcombat.combat.StaminaManager;
@@ -19,10 +22,13 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid = CompactCombat.MOD_ID, value = Dist.CLIENT)
 public class HudRenderer {
 
+    private static final int BOSS_BAR_WIDTH = 180;
+    private static final int BOSS_BAR_HEIGHT = 10;
     private static final int STAMINA_BAR_WIDTH = 100;
     private static final int STAMINA_BAR_HEIGHT = 8;
     private static final int MAX_STAMINA = 100;
     private static final int BACKGROUND_COLOR = 0xAA202020;
+    private static final int BOSS_HEALTH_COLOR = 0xFFD94A4A;
     private static final int STAMINA_COLOR = 0xFF2ECC71;
     private static final int LOW_STAMINA_COLOR = 0xFFFFD166;
     private static final int TEXT_COLOR = 0xFFFFFFFF;
@@ -35,11 +41,17 @@ public class HudRenderer {
 
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
-        if (player == null || !CombatState.isCombatMode())
+        if (player == null)
             return;
 
-        drawCombatStatus(event.getGuiGraphics(), mc, player, event.getWindow().getGuiScaledWidth(),
-                event.getWindow().getGuiScaledHeight());
+        int screenWidth = event.getWindow().getGuiScaledWidth();
+        int screenHeight = event.getWindow().getGuiScaledHeight();
+
+        drawBossStatus(event.getGuiGraphics(), mc, screenWidth);
+
+        if (CombatState.isCombatMode()) {
+            drawCombatStatus(event.getGuiGraphics(), mc, player, screenWidth, screenHeight);
+        }
     }
 
     private static void drawCombatStatus(GuiGraphics guiGraphics, Minecraft mc, Player player, int screenWidth,
@@ -74,5 +86,28 @@ public class HudRenderer {
             int color) {
         int x = centerX - mc.font.width(text) / 2;
         guiGraphics.drawString(mc.font, text, x, y, color);
+    }
+
+    private static void drawBossStatus(GuiGraphics guiGraphics, Minecraft mc, int screenWidth) {
+        BossHudData bossHudData = BossManager.getActiveBossHudData();
+        if (bossHudData == null)
+            return;
+
+        int x = screenWidth / 2 - BOSS_BAR_WIDTH / 2;
+        int y = 14;
+
+        drawCenteredText(guiGraphics, mc, bossHudData.getBossName(), screenWidth / 2, y, TEXT_COLOR);
+        drawBar(guiGraphics, x, y + 12, BOSS_BAR_WIDTH, BOSS_BAR_HEIGHT, bossHudData.getHealthPercentage(),
+                BACKGROUND_COLOR, BOSS_HEALTH_COLOR);
+        drawCenteredText(guiGraphics, mc, getPhaseText(bossHudData.getCurrentPhase()), screenWidth / 2, y + 25,
+                MUTED_TEXT_COLOR);
+    }
+
+    private static String getPhaseText(BossPhase phase) {
+        return switch (phase) {
+            case PHASE_ONE -> "Phase One";
+            case PHASE_TWO -> "Phase Two";
+            case PHASE_THREE -> "Phase Three";
+        };
     }
 }
