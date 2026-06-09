@@ -3,6 +3,7 @@ package com.t.compactcombat.combat;
 import com.t.compactcombat.client.CombatFeedback;
 import com.t.compactcombat.combat.weapon.WeaponData;
 import com.t.compactcombat.combat.weapon.WeaponManager;
+import com.t.compactcombat.skill.SkillBonuses;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
@@ -42,7 +43,8 @@ public class ComboManager {
         if (attackCooldownTicks > 0) return;
 
         WeaponData weapon = WeaponManager.getCurrentWeapon(mc.player);
-        int staminaCost = Math.round(15 * weapon.getStaminaCostMultiplier());
+        int staminaCost = Math.round(15 * weapon.getStaminaCostMultiplier()
+                * (1.0F - SkillBonuses.getAgilityStaminaDiscount()));
         if (StaminaManager.getStamina() < staminaCost) return;
 
         StaminaManager.useStamina(staminaCost);

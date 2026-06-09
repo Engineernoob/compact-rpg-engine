@@ -27,11 +27,19 @@ public class DamageNumberRenderer {
     private static final List<DamageNumber> DAMAGE_NUMBERS = new ArrayList<>();
 
     public static void spawn(double x, double y, double z, float damage) {
+        addDamageNumber(new DamageNumber(formatDamage(damage), x, y, z, DEFAULT_LIFETIME_TICKS, 0x00FFDF6E));
+    }
+
+    public static void spawnText(double x, double y, double z, String text, int color) {
+        addDamageNumber(new DamageNumber(text, x, y, z, DEFAULT_LIFETIME_TICKS, color & 0x00FFFFFF));
+    }
+
+    private static void addDamageNumber(DamageNumber damageNumber) {
         if (DAMAGE_NUMBERS.size() >= MAX_DAMAGE_NUMBERS) {
             DAMAGE_NUMBERS.remove(0);
         }
 
-        DAMAGE_NUMBERS.add(new DamageNumber(damage, x, y, z, DEFAULT_LIFETIME_TICKS));
+        DAMAGE_NUMBERS.add(damageNumber);
     }
 
     @SubscribeEvent
@@ -76,7 +84,7 @@ public class DamageNumberRenderer {
         float progress = Math.min(1.0F, age / damageNumber.maxLifetimeTicks);
         float alpha = 1.0F - progress;
         double floatingY = damageNumber.y + progress * 0.65;
-        int color = ((int) (alpha * 255.0F) << 24) | 0x00FFDF6E;
+        int color = ((int) (alpha * 255.0F) << 24) | damageNumber.color;
 
         poseStack.pushPose();
         poseStack.translate(damageNumber.x - cameraPosition.x, floatingY - cameraPosition.y,
@@ -91,22 +99,22 @@ public class DamageNumberRenderer {
     }
 
     private static class DamageNumber {
-        private final float damage;
         private final double x;
         private final double y;
         private final double z;
         private final int maxLifetimeTicks;
         private final String text;
+        private final int color;
         private int lifetimeTicks;
 
-        private DamageNumber(float damage, double x, double y, double z, int maxLifetimeTicks) {
-            this.damage = damage;
+        private DamageNumber(String text, double x, double y, double z, int maxLifetimeTicks, int color) {
             this.x = x;
             this.y = y;
             this.z = z;
             this.maxLifetimeTicks = maxLifetimeTicks;
             this.lifetimeTicks = maxLifetimeTicks;
-            this.text = formatDamage(damage);
+            this.text = text;
+            this.color = color;
         }
 
         private void tick() {
@@ -121,12 +129,13 @@ public class DamageNumberRenderer {
             return maxLifetimeTicks - lifetimeTicks + partialTick;
         }
 
-        private static String formatDamage(float damage) {
-            if (damage == Math.round(damage)) {
-                return Integer.toString(Math.round(damage));
-            }
+    }
 
-            return String.format("%.1f", damage);
+    private static String formatDamage(float damage) {
+        if (damage == Math.round(damage)) {
+            return Integer.toString(Math.round(damage));
         }
+
+        return String.format("%.1f", damage);
     }
 }

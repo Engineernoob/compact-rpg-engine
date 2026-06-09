@@ -5,8 +5,15 @@ import com.t.compactcombat.client.CombatFeedback;
 import com.t.compactcombat.client.DamageNumberRenderer;
 import com.t.compactcombat.combat.weapon.WeaponData;
 import com.t.compactcombat.combat.weapon.WeaponManager;
+import com.t.compactcombat.entity.elite.EliteData;
+import com.t.compactcombat.entity.elite.EliteManager;
+import com.t.compactcombat.skill.SkillBonuses;
+import com.t.compactcombat.skill.SkillData;
+import com.t.compactcombat.skill.SkillManager;
+import com.t.compactcombat.skill.SkillType;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
@@ -33,6 +40,8 @@ public class CombatManager {
                 CombatFeedback.onHit();
                 DamageNumberRenderer.spawn(target.getX(), target.getY() + target.getBbHeight() + 0.3, target.getZ(),
                         damage);
+                showEliteHitText(target);
+                awardCombatExperience(player);
             }
         }
 
@@ -85,7 +94,7 @@ public class CombatManager {
             damage *= 1.2F;
         }
 
-        return damage;
+        return damage * (1.0F + SkillBonuses.getSwordDamageBonus());
     }
 
     private static void applyKnockback(Player player, LivingEntity target, int comboStep, WeaponData weapon) {
@@ -96,5 +105,26 @@ public class CombatManager {
         }
 
         target.knockback(strength, -look.x, -look.z);
+    }
+
+    private static void awardCombatExperience(Player player) {
+        boolean leveledUp = SkillManager.addExperience(SkillType.SWORDSMANSHIP, 5);
+        if (!leveledUp)
+            return;
+
+        SkillData swordsmanship = SkillManager.getSkill(SkillType.SWORDSMANSHIP);
+        player.displayClientMessage(
+                Component.literal("Swordsmanship Lv. " + swordsmanship.getLevel() + " ("
+                        + swordsmanship.getExperience() + "/" + swordsmanship.getXpRequired() + ")"),
+                true);
+    }
+
+    private static void showEliteHitText(LivingEntity target) {
+        if (!EliteManager.isElite(target))
+            return;
+
+        EliteData eliteData = EliteManager.getEliteData(target);
+        DamageNumberRenderer.spawnText(target.getX(), target.getY() + target.getBbHeight() + 0.65, target.getZ(),
+                "ELITE: " + eliteData.getModifier(), eliteData.getColor());
     }
 }

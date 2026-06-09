@@ -88,13 +88,22 @@ Run the Minecraft client:
 
 bash ./gradlew runClient
 
-## Status
+## Current Development Status
 
-This project is in early prototype development.
+### v0.1.0 — Core Combat Prototype
+- Combat Mode
+- Stamina
+- Dodge
+- Combo Attacks
+- Hit Detection
 
-Current version:
-
-txt v0.0.1 — Core combat prototype
+### v0.2.0 — RPG Foundation
+- Weapon Framework
+- Skill Progression
+- Passive Bonuses
+- Combat HUD
+- Floating Damage Numbers
+- Combat Feedback
 
 ## Author
 

@@ -5,6 +5,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import com.t.compactcombat.client.CombatEffects;
 import com.t.compactcombat.client.CombatFeedback;
+import com.t.compactcombat.skill.SkillBonuses;
 
 public class DodgeManager {
 
@@ -26,10 +27,12 @@ public class DodgeManager {
             return;
         if (cooldownTicks > 0)
             return;
-        if (StaminaManager.getStamina() < 25)
+
+        int staminaCost = Math.round(25 * (1.0F - SkillBonuses.getAgilityStaminaDiscount()));
+        if (StaminaManager.getStamina() < staminaCost)
             return;
 
-        StaminaManager.useStamina(25);
+        StaminaManager.useStamina(staminaCost);
         cooldownTicks = 14;
 
         Vec3 look = player.getLookAngle();
