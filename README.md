@@ -51,18 +51,18 @@ Instead of relying on heavy systems, the mod focuses on:
 
 ### Milestone 2 — Combat Feel
 
-- [ ] Improved HUD
-- [ ] Camera shake
-- [ ] Hit stop
-- [ ] Forward lunge
-- [ ] Better slash effects
+- [x] Improved HUD
+- [x] Camera shake
+- [x] Hit stop
+- [x] Forward lunge
+- [x] Better slash effects
 
 ### Milestone 3 — Weapon Framework
 
-- [ ] Custom weapon classes
-- [ ] Weapon-specific animations
-- [ ] Combo finishers
-- [ ] Stat-based weapon balancing
+- [x] Custom weapon classes
+- [x] Weapon-specific animations
+- [x] Combo finishers
+- [x] Stat-based weapon balancing
 
 ### Milestone 4 — RPG Systems
 
@@ -77,16 +77,6 @@ Instead of relying on heavy systems, the mod focuses on:
 - [ ] Boss framework
 - [ ] JSON-driven content
 - [ ] Multiplayer-safe combat
-
-## Development
-
-Build the project:
-
-bash ./gradlew build
-
-Run the Minecraft client:
-
-bash ./gradlew runClient
 
 ## Current Development Status
 
@@ -104,6 +94,15 @@ bash ./gradlew runClient
 - Combat HUD
 - Floating Damage Numbers
 - Combat Feedback
+
+### v0.3.0 — Bosses & Loot Foundation
+- Boss Framework
+- Boss HUD
+- Phase System
+- Test Bosses
+- Loot Rarity
+- Affix Generation
+- Boss Rewards
 
 ## Author
 
