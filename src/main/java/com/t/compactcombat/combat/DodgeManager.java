@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import com.t.compactcombat.client.CombatEffects;
+import com.t.compactcombat.client.CombatFeedback;
 
 public class DodgeManager {
 
@@ -39,6 +40,7 @@ public class DodgeManager {
                 -look.z * 0.9);
 
         player.hurtMarked = true;
+        CombatFeedback.onDodge(player);
         CombatEffects.dodgeBurst();
     }
 }

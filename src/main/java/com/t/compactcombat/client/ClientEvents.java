@@ -36,6 +36,7 @@ public class ClientEvents {
             StaminaManager.regenerate();
             DodgeManager.tick();
             ComboManager.tick();
+            CombatFeedback.tick();
 
             while (Keybinds.TOGGLE_COMBAT.consumeClick()) {
                 CombatState.toggleCombatMode();

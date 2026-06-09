@@ -1,6 +1,8 @@
 package com.t.compactcombat.combat;
 
 import com.t.compactcombat.client.CombatEffects;
+import com.t.compactcombat.client.CombatFeedback;
+import com.t.compactcombat.client.DamageNumberRenderer;
 import com.t.compactcombat.combat.weapon.WeaponData;
 import com.t.compactcombat.combat.weapon.WeaponManager;
 
@@ -24,8 +26,14 @@ public class CombatManager {
         WeaponData weapon = WeaponManager.getCurrentWeapon(player);
         LivingEntity target = findTarget(player, weapon.getReach());
         if (target != null) {
-            target.hurt(player.damageSources().playerAttack(player), getComboDamage(comboStep, weapon));
-            applyKnockback(player, target, comboStep, weapon);
+            float damage = getComboDamage(comboStep, weapon);
+            boolean damaged = target.hurt(player.damageSources().playerAttack(player), damage);
+            if (damaged) {
+                applyKnockback(player, target, comboStep, weapon);
+                CombatFeedback.onHit();
+                DamageNumberRenderer.spawn(target.getX(), target.getY() + target.getBbHeight() + 0.3, target.getZ(),
+                        damage);
+            }
         }
 
         CombatEffects.slash(comboStep);
